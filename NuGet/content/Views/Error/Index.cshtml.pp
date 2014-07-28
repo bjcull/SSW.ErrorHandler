@@ -1,5 +1,5 @@
-﻿@using $rootnamespace$
-@model HandleErrorInfo
+﻿@using $rootnamespace$.Models.Error
+@model CustomHandleErrorInfo
 
 @{
     ViewBag.Title = "Error";
@@ -15,7 +15,7 @@
     <div class="row form-group">
         <div class="col-sm-12">
             <h2>Error Message for Humans:</h2>
-            <p>@Model.Exception.Message</p>
+            <p>@Model.DisplayErrorMessage</p>
         </div>
     </div>
     <div class="row form-group">

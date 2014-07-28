@@ -1,16 +1,27 @@
-<?xml version="1.0"?>
-<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>SSW.ErrorHandler</id>
-    <version>1.0</version>
-    <authors>Ben Cull</authors>
-    <owners>Ben Cull, SSW</owners>
-    <iconUrl>http://www.hanselman.com/images/nugeticon.png</iconUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The ultimate MVC Error Handler. Once installed your website will show graceful error pages and will respond to AJAX requests with dignity.</description>
-    <tags>Elmah Error Handler MVC SSW</tags>
-     <dependencies>
-      <dependency id="WebActivator" version="1.1" />
-    </dependencies> 
-  </metadata>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>SSW.ErrorHandler</id>
+        <version>1.1</version>
+        <authors>Ben Cull</authors>
+        <owners>Ben Cull,SSW</owners>
+        <projectUrl>https://github.com/SSWConsulting/SSW.ErrorHandler</projectUrl>
+        <iconUrl>https://github.com/SSWConsulting/SSW.ErrorHandler/raw/master/Assets/ssw-logo_nuget.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>The ultimate MVC Error Handler. Once installed your website will show graceful error pages and will respond to AJAX requests with dignity.</description>
+        <tags>Elmah Error Handler MVC SSW</tags>
+        <dependencies>
+            <dependency id="WebActivatorEx" version="2.0.5" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="content\App_Start\ErrorHandlerStartup.cs.pp" target="content\App_Start\ErrorHandlerStartup.cs.pp" />
+        <file src="content\Controllers\ErrorController.cs.pp" target="content\Controllers\ErrorController.cs.pp" />
+        <file src="content\Filters\CustomErrorFilter.cs.pp" target="content\Filters\CustomErrorFilter.cs.pp" />
+        <file src="content\Models\Error\CustomHandleErrorInfo.cs.pp" target="content\Models\Error\CustomHandleErrorInfo.cs.pp" />
+        <file src="content\Views\Error\Index.cshtml.pp" target="content\Views\Error\Index.cshtml.pp" />
+        <file src="content\Views\Error\NotFound.cshtml.pp" target="content\Views\Error\NotFound.cshtml.pp" />
+        <file src="content\web.config.install.xdt" target="content\web.config.install.xdt" />
+        <file src="content\web.config.uninstall.xdt" target="content\web.config.uninstall.xdt" />
+    </files>
 </package>

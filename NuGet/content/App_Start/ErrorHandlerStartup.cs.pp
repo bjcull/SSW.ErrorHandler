@@ -19,7 +19,7 @@ namespace $rootnamespace$
                 GlobalFilters.Filters.Remove(existingErrorFilter.Instance);
             }
 
-	        GlobalFilters.Filters.Add(new CustomErrorFilter());
+	        GlobalFilters.Filters.Add(new CustomErrorFilter(), 10);
 	    }
 	}
 }

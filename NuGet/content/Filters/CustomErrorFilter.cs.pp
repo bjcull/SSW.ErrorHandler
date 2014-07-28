@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using $rootnamespace$.Controllers;
+using $rootnamespace$.Models.Error;
 
 namespace $rootnamespace$.Filters
 {
@@ -12,10 +14,12 @@ namespace $rootnamespace$.Filters
     {
         public void OnException(ExceptionContext filterContext)
         {
-            if (filterContext.ExceptionHandled)
+            if (filterContext.ExceptionHandled || HasRecursedTooManyTimes(filterContext))
             {
                 return;
             }
+
+            var recursiveErrorMessage = GetRecursiveErrorMessage(filterContext.Exception);
 
             // if the request is AJAX return JSON else view.
             if (filterContext.HttpContext.Request.IsAjaxRequest())
@@ -26,7 +30,7 @@ namespace $rootnamespace$.Filters
                     Data = new
                     {
                         error = true,
-                        message = filterContext.Exception.Message
+                        message = recursiveErrorMessage
                     }
                 };
 
@@ -45,15 +49,10 @@ namespace $rootnamespace$.Filters
 
             var controllerName = (string)filterContext.RouteData.Values["controller"];
             var actionName = (string)filterContext.RouteData.Values["action"];
-            var model = new HandleErrorInfo(filterContext.Exception, controllerName, actionName);
-
-            //filterContext.Result = new ViewResult
-            //{
-            //    ViewName = View,
-            //    MasterName = Master,
-            //    ViewData = new ViewDataDictionary<HandleErrorInfo>(model),
-            //    TempData = filterContext.Controller.TempData
-            //};
+            var model = new CustomHandleErrorInfo(filterContext.Exception, controllerName, actionName)
+            {
+                DisplayErrorMessage = recursiveErrorMessage
+            };
 
             var controller = DependencyResolver.Current.GetService<ErrorController>();
             var routeData = new RouteData();
@@ -83,9 +82,50 @@ namespace $rootnamespace$.Filters
 
             controller.ViewData.Model = model;
             ((IController)controller).Execute(new RequestContext(filterContext.HttpContext, routeData));
+        }
 
-            // log the error using log4net.
-            //_logger.Error(filterContext.Exception.Message, filterContext.Exception);
+        private string GetRecursiveErrorMessage(Exception ex, string delimeter = " --- ")
+        {
+            var sb = new StringBuilder();
+            var currentException = ex;
+            while (currentException != null)
+            {
+                if (!string.IsNullOrEmpty(sb.ToString()))
+                {
+                    sb.Append(delimeter);
+                }
+                sb.Append(currentException.Message);
+
+                currentException = currentException.InnerException;
+            }
+
+            return sb.ToString();
+        }
+
+        private bool HasRecursedTooManyTimes(ExceptionContext filterContext, int recursionLimit = 3)
+        {
+            int? exceptionDepth = 0;
+            if (filterContext.HttpContext.Items.Contains("ExceptionDepth"))
+            {
+                exceptionDepth = filterContext.HttpContext.Items["ExceptionDepth"] as int?;
+                filterContext.HttpContext.Items["ExceptionDepth"] = exceptionDepth.HasValue
+                    ? exceptionDepth + 1
+                    : recursionLimit;
+            }
+            else
+            {
+                filterContext.HttpContext.Items["ExceptionDepth"] = 1;
+            }
+
+            if (exceptionDepth >= recursionLimit)
+            {
+                filterContext.HttpContext.Response.Clear();
+                filterContext.HttpContext.Response.Write(
+                    "An error has occurred, but in trying to display it, another error has occurred.");
+                return true;
+            }
+
+            return false;
         }
     }
 }
